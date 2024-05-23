@@ -1,9 +1,7 @@
-import JobItemContent from "./JobItemContent";
-import Sidebar from "./Sidebar";
 
-export default function Container({ jobItems }) {
+
+export default function Container({ children }) {
   return <div className="container">
-    <Sidebar jobItems={jobItems} />
-    <JobItemContent />
+    {children}
   </div>;
 }
