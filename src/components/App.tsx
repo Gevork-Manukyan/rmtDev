@@ -19,12 +19,17 @@ import SortingControls from "./SortingControls";
 function App() {
   const [jobItems, setJobItems] = useState([])
   const [searchText, setSearchText] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
+      setIsLoading(true);
+
       const response = await fetch(`https://bytegrad.com/course-assets/projects/rmtdev/api/data?search=${searchText}`);
       const data = await response.json();
       setJobItems(data.jobItems);
+
+      setIsLoading(false);
     }
     
     if (!searchText) return;
@@ -49,7 +54,7 @@ function App() {
           <SortingControls />
         </SidebarTop>
 
-        <JobList jobItems={jobItems} />
+        <JobList jobItems={jobItems} isLoading={isLoading} />
         <PaginationControls />
       </Sidebar>
       <JobItemContent />
