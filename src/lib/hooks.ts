@@ -54,18 +54,21 @@ export function useActiveJobItemId () {
 
 export function useJobItem (id: number | null) {  
   const [jobItem, setJobItem] = useState<DetailedJobItem | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     const fetchJobInfo = async () => {
       if (!id) return;
-  
+      
+      setIsLoading(true);
       const res = await fetch(`${BASE_API_URL}/${id}`);
       const data = await res.json();
       setJobItem(data.jobItem)
+      setIsLoading(false);
     }
 
     fetchJobInfo();
   }, [id])
 
-  return jobItem;
+  return [jobItem, isLoading] as const;
 }
