@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { JobItem } from "./types";
+import { DetailedJobItem, JobItem } from "./types";
 import { BASE_API_URL } from "./constants";
 
 export function useJobItems (searchText: string) {
@@ -53,7 +53,7 @@ export function useActiveJobItemId () {
 }
 
 export function useJobItem (id: number | null) {  
-  const [jobItem, setJobItem] = useState(null);
+  const [jobItem, setJobItem] = useState<DetailedJobItem | null>(null);
 
   useEffect(() => {
     const fetchJobInfo = async () => {
