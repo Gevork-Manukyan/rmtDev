@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { DetailedJobItem, JobItem } from "./types";
 import { BASE_API_URL } from "./constants";
 import { useQuery } from "@tanstack/react-query";
+import { handleError } from "./utils";
 
 type JobItemApiResponse = {
   public: boolean;
@@ -28,9 +29,7 @@ export function useJobItem(id: number | null) {
       refetchOnWindowFocus: false,
       retry: false,
       enabled: Boolean(id),
-      onError: (error) => {
-        console.log(error);
-      },
+      onError: handleError,
     }
   );
 
@@ -41,10 +40,18 @@ type JobItemsApiResponse = {
   public: boolean;
   sorted: boolean;
   jobItems: JobItem[];
-}
+};
 
-const fetchJobItems = async (searchText: string): Promise<JobItemsApiResponse> => {
+const fetchJobItems = async (
+  searchText: string
+): Promise<JobItemsApiResponse> => {
   const response = await fetch(`${BASE_API_URL}?search=${searchText}`);
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.description);
+  }
+
   const data = await response.json();
   return data;
 };
@@ -58,9 +65,7 @@ export function useJobItems(searchText: string) {
       refetchOnWindowFocus: false,
       retry: false,
       enabled: Boolean(searchText),
-      onError: (error) => {
-        console.log(error);
-      },
+      onError: handleError,
     }
   );
 
@@ -69,28 +74,28 @@ export function useJobItems(searchText: string) {
     isLoading: isInitialLoading,
   } as const;
 }
-  // const [jobItems, setJobItems] = useState<JobItem[]>([]);
-  // const [isLoading, setIsLoading] = useState(false);
+// const [jobItems, setJobItems] = useState<JobItem[]>([]);
+// const [isLoading, setIsLoading] = useState(false);
 
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     setIsLoading(true);
+// useEffect(() => {
+//   const fetchData = async () => {
+//     setIsLoading(true);
 
-  //     const response = await fetch(`${BASE_API_URL}?search=${searchText}`);
-  //     const data = await response.json();
-  //     setJobItems(data.jobItems);
+//     const response = await fetch(`${BASE_API_URL}?search=${searchText}`);
+//     const data = await response.json();
+//     setJobItems(data.jobItems);
 
-  //     setIsLoading(false);
-  //   };
+//     setIsLoading(false);
+//   };
 
-  //   if (!searchText) return;
-  //   fetchData();
-  // }, [searchText]);
+//   if (!searchText) return;
+//   fetchData();
+// }, [searchText]);
 
-  // return {
-  //   jobItems,
-  //   isLoading,
-  // } as const;
+// return {
+//   jobItems,
+//   isLoading,
+// } as const;
 
 export function useActiveJobItemId() {
   const [activeJobItemId, setActiveJobItemId] = useState<number | null>(null);
