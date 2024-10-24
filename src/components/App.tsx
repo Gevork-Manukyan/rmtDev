@@ -17,7 +17,7 @@ import SortingControls from "./SortingControls";
 import { useDebounce, useJobItems } from "../lib/hooks";
 import { Toaster } from "react-hot-toast";
 import { RESULTS_PER_PAGE } from "../lib/constants";
-import { TDirection, TSortBy } from "../lib/types";
+import { TPageDirection, TSortBy } from "../lib/types";
 
 function App() {
   const [searchText, setSearchText] = useState("");
@@ -28,13 +28,13 @@ function App() {
 
   const totalNumberOfResults = jobItems?.length || 0;
   const totalNumberOfPages = totalNumberOfResults / RESULTS_PER_PAGE
-  const jobItemsSorted = jobItems?.sort((a, b) => {
+  const jobItemsSorted = [...(jobItems || [])].sort((a, b) => {
     if (sortBy === 'relevant') return b.relevanceScore - a.relevanceScore;
     else return a.daysAgo - b.daysAgo;
   })
-  const jobItemsSortedAndSliced = jobItemsSorted?.slice((currentPage - 1) * RESULTS_PER_PAGE, currentPage * RESULTS_PER_PAGE) || [];
+  const jobItemsSortedAndSliced = jobItemsSorted.slice((currentPage - 1) * RESULTS_PER_PAGE, currentPage * RESULTS_PER_PAGE);
 
-  const handleChangePage = (direction: TDirection) => {
+  const handleChangePage = (direction: TPageDirection) => {
     if (direction === "next") {
       setCurrentPage((prev) => prev + 1)
     } else if (direction === "prev") {
