@@ -43,6 +43,7 @@ function App() {
   }
 
   const handleChangeSortBy = (option: TSortBy) => {
+    console.log(option)
     setSortBy(option)
     setCurrentPage(1 )
   }
