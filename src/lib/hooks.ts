@@ -130,3 +130,18 @@ export function useDebounce<T>(value: T, delay = 1000) {
 
   return debounceValue;
 }
+
+export function useLocalStorage(key: string) {
+  const [value, setValue] = useState(() => 
+    JSON.parse(localStorage.getItem(key) || "[]")
+  )
+
+  useEffect(() => {
+    localStorage.setItem(key, JSON.stringify(value))
+  }, [value, key])
+
+  return [
+    value,
+    setValue
+  ]
+}
