@@ -1,7 +1,7 @@
 import { useContext, useEffect, useState } from "react";
 import { DetailedJobItem, JobItem } from "./types";
 import { BASE_API_URL } from "./constants";
-import { useQuery } from "@tanstack/react-query";
+import { useQueries, useQuery } from "@tanstack/react-query";
 import { handleError } from "./utils";
 import { BookmarksContext } from "../contexts/BookmarksContextProvider";
 
@@ -37,13 +37,35 @@ export function useJobItem(id: number | null) {
   return { jobItem: data?.jobItem, isLoading: isInitialLoading } as const;
 }
 
+export function useJobItems(idArray: number[]) {
+  const results = useQueries({
+    queries: idArray.map(id => ({
+      queryKey: ['job-item', id],
+      queryFn: () => fetchJobItem(id),
+      staleTime: 1000 * 60 * 60,
+      refetchOnWindowFocus: false,
+      retry: false,
+      enabled: Boolean(id),
+      onError: handleError,
+    }))
+  })
+
+  const jobItems = results
+    .map(result => result.data?.jobItem)
+    .filter(jobItem => jobItem !== undefined);
+
+  const isLoading = results.some(result => result.isLoading)
+
+  return { jobItems, isLoading };
+}
+
 type JobItemsApiResponse = {
   public: boolean;
   sorted: boolean;
   jobItems: JobItem[];
 };
 
-const fetchJobItems = async (
+const searchJobItems = async (
   searchText: string
 ): Promise<JobItemsApiResponse> => {
   const response = await fetch(`${BASE_API_URL}?search=${searchText}`);
@@ -57,10 +79,10 @@ const fetchJobItems = async (
   return data;
 };
 
-export function useJobItems(searchText: string) {
+export function useSearchQuery(searchText: string) {
   const { data, isInitialLoading } = useQuery(
     ["job-items", searchText],
-    () => fetchJobItems(searchText),
+    () => searchJobItems(searchText),
     {
       staleTime: 1000 * 60 * 60,
       refetchOnWindowFocus: false,
