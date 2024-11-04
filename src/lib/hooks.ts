@@ -52,7 +52,7 @@ export function useJobItems(idArray: number[]) {
 
   const jobItems = results
     .map(result => result.data?.jobItem)
-    .filter(jobItem => jobItem !== undefined);
+    .filter(jobItem => jobItem !== undefined) as DetailedJobItem[];
 
   const isLoading = results.some(result => result.isLoading)
 
