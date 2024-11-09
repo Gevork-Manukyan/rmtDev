@@ -120,6 +120,8 @@ export function useSearchQuery(searchText: string) {
 //   isLoading,
 // } as const;
 
+// -------------------------------------------------------------------------------------
+
 export function useActiveJobItemId() {
   const [activeJobItemId, setActiveJobItemId] = useState<number | null>(null);
 
@@ -168,6 +170,24 @@ export function useLocalStorage<T>(key: string, initalValue: T): [T, React.Dispa
     setValue
   ] as const;
 }
+
+export function useOnClickOutside(refArray: React.RefObject<HTMLElement>[], callback: () => void) {
+  useEffect(() => {
+    const handleClick = (e: MouseEvent) => {
+      if (refArray.every((ref) => !ref.current?.contains(e.target as Node))) {
+        callback()
+      }
+    }
+
+    document.addEventListener("click", handleClick)
+
+    return () => {
+      document.removeEventListener("click", handleClick)
+    }
+  }, [refArray, callback])
+}
+
+// -------------------------------------------------------------------------------------
 
 export function useBookmarksContext() {
   const context = useContext(BookmarksContext)
