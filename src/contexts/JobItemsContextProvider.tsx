@@ -1,4 +1,4 @@
-import { createContext, useMemo, useState } from "react"
+import { createContext, useCallback, useMemo, useState } from "react"
 import { useSearchQuery, useSearchTextContext } from "../lib/hooks";
 import { JobItem, TPageDirection, TSortBy } from "../lib/types";
 import { RESULTS_PER_PAGE } from "../lib/constants";
@@ -36,32 +36,46 @@ export default function JobItemsContextProvider({ children }: {children: React.R
         [jobItemsSorted, currentPage]
     );
   
-    const handleChangePage = (direction: TPageDirection) => {
-      if (direction === "next") {
-        setCurrentPage((prev) => prev + 1)
-      } else if (direction === "prev") {
-        setCurrentPage((prev) => prev - 1)
-      }
-    }
+    const handleChangePage = useCallback(() => {
+        (direction: TPageDirection) => {
+            if (direction === "next") {
+                setCurrentPage((prev) => prev + 1)
+            } else if (direction === "prev") {
+                setCurrentPage((prev) => prev - 1)
+            }
+        }
+    }, [])
   
-    const handleChangeSortBy = (option: TSortBy) => {
-      console.log(option)
-      setSortBy(option)
-      setCurrentPage(1 )
-    }    
+    const handleChangeSortBy = useCallback(() => {
+        (option: TSortBy) => {
+            setSortBy(option)
+            setCurrentPage(1)
+        }
+    }, [])
+
+    const contextValue = useMemo(() => ({
+        isLoading,
+        currentPage,
+        sortBy,
+        totalNumberOfResults,
+        totalNumberOfPages,
+        jobItemsSortedAndSliced,
+        handleChangePage,
+        handleChangeSortBy
+    }), [
+        isLoading,
+        currentPage,
+        sortBy,
+        totalNumberOfResults,
+        totalNumberOfPages,
+        jobItemsSortedAndSliced,
+        handleChangePage,
+        handleChangeSortBy
+    ])
 
     return (
         <JobItemsContext.Provider
-            value={{
-                isLoading,
-                currentPage,
-                sortBy,
-                totalNumberOfResults,
-                totalNumberOfPages,
-                jobItemsSortedAndSliced,
-                handleChangePage,
-                handleChangeSortBy
-            }}
+            value={contextValue}
         >
             {children}
         </JobItemsContext.Provider>
